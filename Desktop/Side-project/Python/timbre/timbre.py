@@ -33,9 +33,9 @@ headers = {"Authorization": "Bearer {}".format(token), "Accept-Language": "en"}
 # "https://open.spotify.com/genre/section0JQ5IMCbQBLuRvGbRRoxQW" R&B
 # "https://open.spotify.com/genre/section0JQ5IMCbQBLnjETREflcqJ" HH
 
-table_name = 'Pop'
+table_name = 'Electronic'
 
-URLs = URL_scraper.Spotify_Genre_scraper("https://open.spotify.com/genre/section0JQ5IMCbQBLoSVpnseIhn6")
+URLs = URL_scraper.Spotify_Genre_scraper("https://open.spotify.com/genre/section0JQ5IMCbQBLjM0PD2WsCNe")
 for n, i in enumerate(URLs):
     responses = requests.get("https://api.spotify.com/v1/playlists/" + i, headers=headers)
     myjson_data = json.loads(responses.text)
@@ -69,6 +69,8 @@ for n, i in enumerate(URLs):
 
             if len(i['track']['album']['release_date']) == 4:
                 song_r_date = i['track']['album']['release_date'] + "-01-01"
+            elif len(i['track']['album']['release_date']) == 7:
+                song_r_date = i['track']['album']['release_date'] + "-01"
             else:
                 song_r_date = i['track']['album']['release_date']
 
@@ -77,7 +79,9 @@ for n, i in enumerate(URLs):
 
             song_analysis = requests.get(f"https://api.spotify.com/v1/audio-analysis/{song_ids}", headers=headers)
             data = get_song_attributes(song_analysis.text)
-            song_segments = pd.DataFrame(data["segments"])
+            if "segments" in data:
+                song_segments = pd.DataFrame(data["segments"])
+
 
             # 把秒的小數去掉
             song_segments["start"] = np.array(song_segments["start"]).round(0)
@@ -109,7 +113,7 @@ for n, i in enumerate(URLs):
     total_songs = pd.concat([total_songs, songs]).reset_index(drop=True)
     print(n, 'times')
 
-    if n == 15:
+    if n == 20:
         break
 
 # print(total_songs.columns)
@@ -181,7 +185,7 @@ def SQL(table, db, kind, df_insert=""):
 data = total_songs[['timbre','length','song_name','release_date','artist','popularity']]
 
 total_songs.to_csv(
-    'timbre.csv',  # 檔案名稱
+    table_name+'.csv',  # 檔案名稱
     encoding='utf-8-sig',  # 編碼
     index=True  # 是否保留index
 )

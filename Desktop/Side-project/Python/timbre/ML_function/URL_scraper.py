@@ -34,7 +34,7 @@ def Spotify_Genre_scraper(g_URL):
 
     time.sleep(1)
     # driver.get('https://accounts.spotify.com/en/login')
-    login = driver.find_element(by=By.XPATH, value='// *[ @ id = "main"] / div / div[3] / div[1] / header / div[5] / button[2]')
+    login = driver.find_element(by=By.XPATH, value='//button[@data-testid="login-button"]')
     login.click()
     time.sleep(3)
 
